@@ -20,7 +20,7 @@ public final class ErrorResponse { //Error + Validation Error
     }
 
     public static ErrorResponse error(String message, String errorCode ) {
-        return new ErrorResponse(message, errorCode, List.of()); //immutable
+        return new ErrorResponse(message, errorCode, List.of());
     }
 
 

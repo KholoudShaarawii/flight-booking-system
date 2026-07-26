@@ -4,6 +4,8 @@ import com.flightbooking.identity.user.enums.UserRole;
 import com.flightbooking.identity.user.enums.UserStatus;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
                 @UniqueConstraint(name = "UK_USERS_EMAIL",
                         columnNames = "EMAIL")
         })
+@Setter
+@Getter
 public class User {
 
     @Id
@@ -38,7 +42,7 @@ public class User {
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "USER_ROLE", nullable = false)
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
@@ -47,7 +51,6 @@ public class User {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
 
     @PrePersist
     private void onCreate() {

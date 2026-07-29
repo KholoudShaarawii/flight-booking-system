@@ -1,24 +1,30 @@
 package com.flightbooking.identity.auth.service;
 
 import com.flightbooking.common.exception.DuplicateResourceException;
-import com.flightbooking.identity.auth.dto.RegisterCustomerRequest;
-import com.flightbooking.identity.auth.dto.RegisterCustomerResponse;
+import com.flightbooking.identity.auth.dto.*;
+import com.flightbooking.identity.security.jwt.JwtService;
 import com.flightbooking.identity.user.entity.User;
 import com.flightbooking.identity.user.enums.UserRole;
 import com.flightbooking.identity.user.enums.UserStatus;
 import com.flightbooking.identity.user.repository.UserRepository;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public RegisterCustomerResponse registerCustomer(RegisterCustomerRequest registerCustomerRequest) {
@@ -52,5 +58,39 @@ public class AuthService {
         );
 
     }
-}
 
+    public LoginResponse loginUser(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+
+        boolean PasswordMatches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+
+        if (!PasswordMatches) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
+
+        if (user.getUserStatus() == UserStatus.BLOCKED) {
+            throw new LockedException("Account is blocked");
+        }
+
+        if (user.getUserStatus() == UserStatus.DEACTIVATED) {
+            throw new DisabledException("Account is deactivated");
+        }
+
+        String accessToken = jwtService.generateToken(user);
+
+        LoginUserResponse loginUserResponse = new LoginUserResponse(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getUserStatus(),
+                user.getAirlineId()
+        );
+
+        return new LoginResponse(
+                accessToken, "Bearer", loginUserResponse);
+
+    }
+}

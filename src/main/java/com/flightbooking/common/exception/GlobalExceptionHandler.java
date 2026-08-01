@@ -1,9 +1,11 @@
 package com.flightbooking.common.exception;
 
+import tools.jackson.databind.exc.UnrecognizedPropertyException;
 import com.flightbooking.common.response.ErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -76,4 +78,39 @@ public class GlobalExceptionHandler {
         }
 
     }
-}
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException exception) {
+        ErrorResponse errorResponse = ErrorResponse.error(exception.getMessage(),
+                "RESOURCE_NOT_FOUND");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException exception) {
+
+        ErrorResponse errorResponse = ErrorResponse.error(exception.getMessage(),
+                    "BAD_REQUEST");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+
+    }
+    //unknown fields not defined in the Request DTO or invalid JSON
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
+
+        Throwable cause = exception.getMostSpecificCause();
+
+        if (cause instanceof UnrecognizedPropertyException unknownField) {
+            ErrorResponse errorResponse= ErrorResponse.error(
+                    "Field '" + unknownField.getPropertyName() + "' is not allowed", "UNKNOWN_FIELD");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+        ErrorResponse errorResponse = ErrorResponse.error(
+                "Invalid request body",
+                "INVALID_REQUEST_BODY"
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+    }

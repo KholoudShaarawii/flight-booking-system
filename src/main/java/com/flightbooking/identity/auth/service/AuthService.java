@@ -1,17 +1,23 @@
 package com.flightbooking.identity.auth.service;
 
+import com.flightbooking.common.exception.BadRequestException;
 import com.flightbooking.common.exception.DuplicateResourceException;
+import com.flightbooking.common.exception.ResourceNotFoundException;
 import com.flightbooking.identity.auth.dto.*;
 import com.flightbooking.identity.security.jwt.JwtService;
 import com.flightbooking.identity.user.entity.User;
 import com.flightbooking.identity.user.enums.UserRole;
 import com.flightbooking.identity.user.enums.UserStatus;
 import com.flightbooking.identity.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.IllegalFormatCodePointException;
+import java.util.Optional;
 
 
 @Service
@@ -92,5 +98,74 @@ public class AuthService {
         return new LoginResponse(
                 accessToken, "Bearer", loginUserResponse);
 
+    }
+
+    public CurrentUserResponse getCurrentUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return new CurrentUserResponse(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole(),
+                user.getUserStatus(),
+                user.getAirlineId());
+
+    }
+
+    @Transactional
+    public CurrentUserResponse updateCurrentUserProfile(Long userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (request.getFirstName() == null && request.getLastName() == null && request.getPhone() == null) {
+            throw new BadRequestException("At least one profile field must be provided");
+
+        }
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+        // User savedUser = userRepository.save(user);
+        return new CurrentUserResponse(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole(),
+                user.getUserStatus(),
+                user.getAirlineId()
+        );
+
+
+    }
+
+    public void changeOldPassword(Long userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+
+        if (!passwordEncoder.matches(request.getOldPassword(),
+                user.getPassword())) {
+            throw new BadRequestException("Old password is incorrect");
+
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
     }
 }

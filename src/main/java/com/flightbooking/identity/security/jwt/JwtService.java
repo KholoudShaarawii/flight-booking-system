@@ -20,10 +20,7 @@ public class JwtService { //Token operations
 
     private final String secretKey;
 
-    public JwtService(
-            @Value("${security.jwt.secret}")
-            String secretKey
-    ) {
+    public JwtService( @Value("${security.jwt.secret}") String secretKey) {
         this.secretKey = secretKey;
     }
 

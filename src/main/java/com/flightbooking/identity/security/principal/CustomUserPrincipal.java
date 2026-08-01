@@ -43,4 +43,8 @@ public class CustomUserPrincipal implements UserDetails { //Security representat
     public boolean isEnabled() {
         return user.getUserStatus() != UserStatus.DEACTIVATED;
     }
+
+    public Long getUserId() {
+        return user.getUserId();
+    }
 }

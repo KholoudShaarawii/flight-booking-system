@@ -12,23 +12,29 @@ This folder contains the planning and design documentation for the Flight Bookin
   Defines the dependency-based backend implementation roadmap, project phases and features, related modules and endpoints, business rules, expected components,             implementation notes, and completion criteria.
 
 
-## Current Progress
+## Phase 1 — Identity and Access Management
 
-The backend is currently implemented and tested through **F1.3 Login**.
+Phase 1 provides the authentication and security foundation of the Flight Booking System.
 
-Completed:
+### Completed Features
 
-- Project foundation and Modular Monolith structure.
-- Oracle Database integration.
-- Standard API responses and global exception handling.
-- **F1.1 User Model**
-- **F1.2 Register Customer**
-  - `POST /api/auth/register`
-- **F1.3 Login**
-  - `POST /api/auth/login`
-  - Email and password authentication.
-  - Account status validation.
-  - JWT access token generation.
-  - Safe user data returned without password information.
-  - `401 Unauthorized` for invalid credentials.
+- Shared `User` model with roles and account statuses.
+- Public customer registration.
+- Secure login using email and password.
+- JWT access-token generation and validation.
+- Protection of authenticated endpoints.
+- Current-user profile retrieval and update.
+- Secure password change.
+- Password hashing and standard API error handling.
 
+### Phase 1 APIs
+
+| Method | Endpoint |
+|---|---|
+| `POST` | `/api/auth/register` |
+| `POST` | `/api/auth/login` |
+| `GET` | `/api/auth/me` |
+| `PATCH` | `/api/auth/me` |
+| `PUT` | `/api/auth/change-password` |
+
+API testing is documented in the Phase 1 API Test Report.

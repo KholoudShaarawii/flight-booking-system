@@ -1,6 +1,7 @@
 package com.flightbooking.common.config;
 
 import com.flightbooking.identity.security.filter.JwtAuthenticationFilter;
+import com.flightbooking.identity.security.handler.CustomAccessDeniedHandler;
 import com.flightbooking.identity.security.jwt.JwtService;
 import com.flightbooking.identity.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +30,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService, UserRepository userRepository) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService, UserRepository userRepository, CustomAccessDeniedHandler customAccessDeniedHandler) throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter =
                 new JwtAuthenticationFilter(
                         jwtService,
@@ -39,11 +40,13 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.accessDeniedHandler(customAccessDeniedHandler))
                 .authorizeHttpRequests(authorize -> authorize
 
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login")
-
                         .permitAll()
+
+                        .requestMatchers("/api/airlines/**").hasRole("SUPER_ADMIN")
 
                         .anyRequest()
                         .authenticated())
@@ -51,4 +54,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 }

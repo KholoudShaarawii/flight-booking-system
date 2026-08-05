@@ -3,7 +3,14 @@ package com.flightbooking.identity.auth.service;
 import com.flightbooking.common.exception.BadRequestException;
 import com.flightbooking.common.exception.DuplicateResourceException;
 import com.flightbooking.common.exception.ResourceNotFoundException;
-import com.flightbooking.identity.auth.dto.*;
+import com.flightbooking.identity.auth.dto.request.ChangePasswordRequest;
+import com.flightbooking.identity.auth.dto.request.LoginRequest;
+import com.flightbooking.identity.auth.dto.request.RegisterCustomerRequest;
+import com.flightbooking.identity.auth.dto.request.UpdateProfileRequest;
+import com.flightbooking.identity.auth.dto.response.CurrentUserResponse;
+import com.flightbooking.identity.auth.dto.response.LoginResponse;
+import com.flightbooking.identity.auth.dto.response.LoginUserResponse;
+import com.flightbooking.identity.auth.dto.response.RegisterCustomerResponse;
 import com.flightbooking.identity.security.jwt.JwtService;
 import com.flightbooking.identity.user.entity.User;
 import com.flightbooking.identity.user.enums.UserRole;
@@ -15,9 +22,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.IllegalFormatCodePointException;
-import java.util.Optional;
 
 
 @Service
@@ -36,7 +40,7 @@ public class AuthService {
     public RegisterCustomerResponse registerCustomer(RegisterCustomerRequest registerCustomerRequest) {
 
         if (userRepository.existsByEmail(registerCustomerRequest.getEmail())) {
-            throw new DuplicateResourceException("Email already exists");
+            throw new DuplicateResourceException("Email already exists","DUPLICATE_EMAIL");
         }
 
         String encodedPassword = passwordEncoder.encode(registerCustomerRequest.getPassword());

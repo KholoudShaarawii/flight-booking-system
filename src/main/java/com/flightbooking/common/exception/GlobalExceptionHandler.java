@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException exception) {
         ErrorResponse errorResponse = ErrorResponse.error(
                 exception.getMessage(),
-                "DUPLICATE_EMAIL");
+                exception.getErrorCode());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
@@ -90,11 +90,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException exception) {
 
         ErrorResponse errorResponse = ErrorResponse.error(exception.getMessage(),
-                    "BAD_REQUEST");
+                "BAD_REQUEST");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 
     }
+
     //unknown fields not defined in the Request DTO or invalid JSON
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
@@ -102,7 +103,7 @@ public class GlobalExceptionHandler {
         Throwable cause = exception.getMostSpecificCause();
 
         if (cause instanceof UnrecognizedPropertyException unknownField) {
-            ErrorResponse errorResponse= ErrorResponse.error(
+            ErrorResponse errorResponse = ErrorResponse.error(
                     "Field '" + unknownField.getPropertyName() + "' is not allowed", "UNKNOWN_FIELD");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
@@ -113,4 +114,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
+            ForbiddenException exception
+    ) {
+        ErrorResponse errorResponse = ErrorResponse.error(
+                exception.getMessage(),
+                "FORBIDDEN");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
+
+
+}

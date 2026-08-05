@@ -1,4 +1,4 @@
-package com.flightbooking.identity.auth.dto;
+package com.flightbooking.identity.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

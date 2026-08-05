@@ -1,4 +1,4 @@
-package com.flightbooking.identity.auth.dto;
+package com.flightbooking.identity.auth.dto.response;
 
 import com.flightbooking.identity.user.enums.UserRole;
 import com.flightbooking.identity.user.enums.UserStatus;

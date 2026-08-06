@@ -38,3 +38,33 @@ Phase 1 provides the authentication and security foundation of the Flight Bookin
 | `PUT` | `/api/auth/change-password` |
 
 API testing is documented in the Phase 1 API Test Report.
+
+
+## Phase 2 — Administration (In Progress)
+
+Phase 2 provides Super Admin operations for managing administrative data in the Flight Booking System.
+
+### Completed Features
+
+- Initial active `SUPER_ADMIN` account for development and protected API testing.
+- Role-based protection of Airline Management endpoints.
+- Airline creation with the default `ACTIVE` status.
+- Partial airline information update.
+- Airline deactivation using the `INACTIVE` status instead of permanent deletion.
+- Duplicate airline-name handling.
+- Paginated airline listing.
+- Optional airline filtering by status and keyword.
+- Standard exception handling for duplicate, not-found, and invalid update requests.
+
+### Completed Phase 2 APIs
+
+| Method | Endpoint |
+|---|---|
+| `POST` | `/api/airlines` |
+| `PATCH` | `/api/airlines/{airlineId}` |
+| `PATCH` | `/api/airlines/{airlineId}/deactivate` |
+| `GET` | `/api/airlines` |
+
+API testing for the completed Phase 2 features is documented in the Phase 2 API Test Report.
+
+Phase 2 is still in progress. Airline Admin Management and Customer Account Management will be added next.

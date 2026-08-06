@@ -9,12 +9,12 @@ import lombok.Setter;
 @Setter
 public class AirlinePageRequest {
     @Min(value = 0, message = "Page number must be zero or greater")
-    private int page = 0; // Default page number
+    private int page = 0;
 
     @Min(value = 1, message = "Page size must be greater than zero")
-    private int size = 10; // Default number of airlines per page
+    private int size = 10;
 
-    private AirlineStatus status; // Optional enum filter, not a raw String
+    private AirlineStatus status;
 
-    private String keyword; // Optional search by airline name or region
+    private String keyword;
 }
